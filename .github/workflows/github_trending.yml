@@ -1,0 +1,29 @@
+name: GitHub Trending Daily Scout
+
+on:
+  schedule:
+    - cron: '0 10 * * *' # 18:00 CST (Beijing Time)
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  run-scout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 openai resend
+
+      - name: Run Trending Notifier
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: python github_trend_notifier.py
